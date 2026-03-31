@@ -1,0 +1,65 @@
+services:
+  train:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.train
+    image: audio-trainer-train
+    container_name: audio-trainer-train
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - ./data:/app/data
+      - ./checkpoints:/app/checkpoints
+      - ./outputs:/app/outputs
+      - ./configs:/app/configs
+      - model-cache:/root/.cache/huggingface
+    shm_size: "16gb"
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - PYTHONUNBUFFERED=1
+      - AUDIO_TRAINER_DATA_DIR=/app/data
+      - AUDIO_TRAINER_CHECKPOINT_DIR=/app/checkpoints
+      - AUDIO_TRAINER_OUTPUT_DIR=/app/outputs
+    profiles:
+      - training
+    stdin_open: true
+    tty: true
+
+  inference:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.inference
+    image: audio-trainer-inference
+    container_name: audio-trainer-inference
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - ./checkpoints:/app/checkpoints:ro
+      - ./data/reference:/app/data/reference:ro
+      - ./outputs:/app/outputs
+      - ./configs:/app/configs:ro
+      - model-cache:/root/.cache/huggingface:ro
+    shm_size: "4gb"
+    ports:
+      - "8000:8000"
+      - "9874:9874"
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - PYTHONUNBUFFERED=1
+      - AUDIO_TRAINER_CHECKPOINT_DIR=/app/checkpoints
+      - AUDIO_TRAINER_OUTPUT_DIR=/app/outputs
+    restart: unless-stopped
+
+volumes:
+  model-cache:
+    name: audio-trainer-model-cache

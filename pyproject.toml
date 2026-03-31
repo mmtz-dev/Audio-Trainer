@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "audio-trainer"
+version = "0.1.0"
+description = "Train and fine-tune TTS voice models using GPT-SoVITS"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+
+dependencies = [
+    "pydantic>=2.0",
+    "pydantic-settings>=2.0",
+    "pyyaml>=6.0",
+    "typer>=0.9",
+    "rich>=13.0",
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.27",
+    "python-multipart>=0.0.6",
+    "librosa>=0.10",
+    "soundfile>=0.12",
+    "numpy>=1.24",
+    "torch>=2.1",
+    "torchaudio>=2.1",
+]
+
+[project.optional-dependencies]
+train = [
+    "faster-whisper>=1.0",
+    "demucs>=4.0",
+    "audiomentations>=0.36",
+]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "httpx>=0.27",
+]
+
+[project.scripts]
+audio-trainer = "cli.main:app"
+
+[tool.setuptools.packages.find]
+include = ["core*", "preprocessing*", "training*", "inference*", "cli*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"

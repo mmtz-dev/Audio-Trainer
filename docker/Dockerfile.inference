@@ -1,0 +1,50 @@
+FROM pytorch/pytorch:2.6.0-cuda12.6-cudnn9-runtime
+
+LABEL maintainer="audio-trainer"
+LABEL description="Audio-Trainer: Inference container with FastAPI + GPT-SoVITS WebUI"
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# System dependencies (lighter than training)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg \
+    libsndfile1 \
+    git \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+# Clone GPT-SoVITS (pinned to stable release)
+ARG GPT_SOVITS_VERSION=20250606v2pro
+RUN git clone --depth 1 --branch ${GPT_SOVITS_VERSION} \
+    https://github.com/RVC-Boss/GPT-SoVITS.git /opt/gpt-sovits
+
+# Install GPT-SoVITS dependencies
+WORKDIR /opt/gpt-sovits
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Add GPT-SoVITS to Python path
+ENV PYTHONPATH="/opt/gpt-sovits:${PYTHONPATH}"
+ENV GPT_SOVITS_DIR="/opt/gpt-sovits"
+
+# Install inference-only dependencies
+COPY requirements-inference.txt /app/requirements-inference.txt
+RUN pip install --no-cache-dir -r /app/requirements-inference.txt
+
+# Copy project code
+COPY . /app
+WORKDIR /app
+
+# Create directories
+RUN mkdir -p checkpoints/finetuned data/reference outputs logs
+
+# Entrypoint
+COPY docker/scripts/entrypoint-inference.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Expose API and GPT-SoVITS WebUI ports
+EXPOSE 8000 9874
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["serve"]

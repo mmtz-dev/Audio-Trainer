@@ -1,0 +1,53 @@
+FROM pytorch/pytorch:2.6.0-cuda12.6-cudnn9-devel
+
+LABEL maintainer="audio-trainer"
+LABEL description="Audio-Trainer: Training container with GPT-SoVITS + preprocessing"
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# System dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg \
+    sox \
+    libsox-dev \
+    libsndfile1 \
+    git \
+    wget \
+    curl \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Clone GPT-SoVITS (pinned to stable release)
+ARG GPT_SOVITS_VERSION=20250606v2pro
+RUN git clone --depth 1 --branch ${GPT_SOVITS_VERSION} \
+    https://github.com/RVC-Boss/GPT-SoVITS.git /opt/gpt-sovits
+
+# Install GPT-SoVITS dependencies
+WORKDIR /opt/gpt-sovits
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Add GPT-SoVITS to Python path
+ENV PYTHONPATH="/opt/gpt-sovits:${PYTHONPATH}"
+ENV GPT_SOVITS_DIR="/opt/gpt-sovits"
+
+# Install Audio-Trainer project dependencies
+COPY requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+# Copy project code
+COPY . /app
+WORKDIR /app
+
+# Create data directories
+RUN mkdir -p data/raw data/processed data/reference \
+    checkpoints/pretrained checkpoints/finetuned \
+    outputs logs
+
+# Entrypoint
+COPY docker/scripts/entrypoint-train.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["--help"]

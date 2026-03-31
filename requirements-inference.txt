@@ -1,0 +1,12 @@
+# Inference-only dependencies (lighter than full requirements.txt)
+pydantic>=2.0
+pydantic-settings>=2.0
+pyyaml>=6.0
+fastapi>=0.110
+uvicorn[standard]>=0.27
+python-multipart>=0.0.6
+librosa>=0.10
+soundfile>=0.12
+numpy>=1.24
+torch>=2.1
+torchaudio>=2.1
