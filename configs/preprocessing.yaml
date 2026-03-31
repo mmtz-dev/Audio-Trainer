@@ -1,0 +1,15 @@
+# Preprocessing configuration
+preprocessing:
+  sample_rate: 32000
+  peak_normalize_db: -1.0
+  min_clip_duration: 2.0
+  max_clip_duration: 15.0
+  silence_threshold_db: -40
+  min_silence_ms: 300
+  min_snr_db: 20.0
+  denoise: true
+  whisper_model: "large-v3"
+  whisper_device: "cuda"
+  whisper_compute_type: "float16"
+  language: "en"
+  speaker_name: "speaker"
