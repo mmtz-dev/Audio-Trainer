@@ -1,0 +1,13 @@
+# High-quality training configuration (more epochs, lower LR)
+training:
+  sovits_epochs: 20
+  sovits_batch_size: 4
+  sovits_lr: 0.00005
+  sovits_save_every_epoch: 4
+  gpt_epochs: 30
+  gpt_batch_size: 4
+  gpt_lr: 0.0001
+  gpt_save_every_epoch: 5
+  precision: "fp16"
+  gradient_checkpointing: true
+  device: "cuda:0"

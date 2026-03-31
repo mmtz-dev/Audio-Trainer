@@ -1,0 +1,13 @@
+# Default training configuration
+training:
+  sovits_epochs: 8
+  sovits_batch_size: 4
+  sovits_lr: 0.0001
+  sovits_save_every_epoch: 2
+  gpt_epochs: 15
+  gpt_batch_size: 4
+  gpt_lr: 0.00015
+  gpt_save_every_epoch: 5
+  precision: "fp16"
+  gradient_checkpointing: true
+  device: "cuda:0"

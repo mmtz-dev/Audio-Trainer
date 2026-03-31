@@ -1,0 +1,13 @@
+# Quick training configuration (for testing)
+training:
+  sovits_epochs: 2
+  sovits_batch_size: 4
+  sovits_lr: 0.0001
+  sovits_save_every_epoch: 1
+  gpt_epochs: 3
+  gpt_batch_size: 4
+  gpt_lr: 0.00015
+  gpt_save_every_epoch: 1
+  precision: "fp16"
+  gradient_checkpointing: true
+  device: "cuda:0"
