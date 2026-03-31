@@ -1,0 +1,16 @@
+# Inference configuration
+# output_dir is configurable via this file, CLI --output-dir, or AUDIO_TRAINER_OUTPUT_DIR env var
+output_dir: "./outputs"
+checkpoint_dir: "./checkpoints"
+
+inference:
+  engine: "gpt-sovits"
+  speaker_name: "speaker"
+  reference_audio: null
+  reference_text: null
+  output_format: "wav"
+  output_sample_rate: 32000
+  normalize_output: true
+  trim_silence: true
+  api_host: "0.0.0.0"
+  api_port: 8000
