@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     wget \
     curl \
+    cmake \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
@@ -23,6 +24,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ARG GPT_SOVITS_VERSION=20250606v2pro
 RUN git clone --depth 1 --branch ${GPT_SOVITS_VERSION} \
     https://github.com/RVC-Boss/GPT-SoVITS.git /opt/gpt-sovits
+
+# Remove broken conda cmake wrapper so the system cmake (from apt) is used
+RUN rm -f /opt/conda/bin/cmake
 
 # Install GPT-SoVITS dependencies
 WORKDIR /opt/gpt-sovits

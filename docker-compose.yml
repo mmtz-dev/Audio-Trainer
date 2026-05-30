@@ -14,6 +14,7 @@ services:
               capabilities: [gpu]
     volumes:
       - ./data:/app/data
+      - ${RAW_AUDIO_DIR:-./data/raw}:/app/data/raw:ro
       - ./checkpoints:/app/checkpoints
       - ./outputs:/app/outputs
       - ./configs:/app/configs
@@ -51,8 +52,8 @@ services:
       - model-cache:/root/.cache/huggingface:ro
     shm_size: "4gb"
     ports:
-      - "8000:8000"
-      - "9874:9874"
+      - "7871:8000"
+      - "7872:9874"
     environment:
       - CUDA_VISIBLE_DEVICES=0
       - PYTHONUNBUFFERED=1
